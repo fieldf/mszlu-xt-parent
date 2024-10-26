@@ -1,6 +1,5 @@
 package com.mszlu.xt.common.service;
 
-
 import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
 import lombok.extern.slf4j.Slf4j;
@@ -26,31 +25,31 @@ public class ServiceTemplateImpl implements ServiceTemplate {
                 return callResult;
             }
             callResult = action.checkBiz();
-            if(callResult==null){
+            if (callResult==null) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 log.warn("execute: Null result while checkBiz");
                 return CallResult.fail(BusinessCodeEnum.CHECK_BIZ_NO_RESULT.getCode(), BusinessCodeEnum.CHECK_BIZ_NO_RESULT.getMsg());
             }
-            if(!callResult.isSuccess()){
+            if (!callResult.isSuccess()) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return callResult;
             }
             long start = System.currentTimeMillis();
             CallResult<T> cr= action.doAction();
             log.info("execute datasource method run time:{}ms", System.currentTimeMillis() - start);
-            if (cr == null){
+            if (cr == null) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return CallResult.fail(BusinessCodeEnum.CHECK_ACTION_NO_RESULT.getCode(), BusinessCodeEnum.CHECK_ACTION_NO_RESULT.getMsg());
             }
-            if (!cr.isSuccess()){
+            if (!cr.isSuccess()) {
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return cr;
             }
-            if(cr.isSuccess()){
+            if (cr.isSuccess()) {
                 action.finishUp(cr);
             }
             return cr;
-        }catch(Exception e){
+        } catch(Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
             log.error("excute error", e);
@@ -62,35 +61,35 @@ public class ServiceTemplateImpl implements ServiceTemplate {
     public <T> CallResult<T> executeQuery(TemplateAction<T> action) {
         try{
             CallResult<T> callResult = action.checkParam();
-            if(callResult==null){
+            if (callResult==null) {
                 log.warn("executeQuery: Null result while checkParam");
                 return CallResult.fail(BusinessCodeEnum.CHECK_PARAM_NO_RESULT.getCode(), BusinessCodeEnum.CHECK_PARAM_NO_RESULT.getMsg());
             }
-            if(!callResult.isSuccess()){
+            if (!callResult.isSuccess()) {
                 return callResult;
             }
             callResult = action.checkBiz();
-            if(callResult==null){
+            if (callResult==null) {
                 log.warn("executeQuery: Null result while checkBiz");
                 return CallResult.fail(BusinessCodeEnum.CHECK_BIZ_NO_RESULT.getCode(), BusinessCodeEnum.CHECK_BIZ_NO_RESULT.getMsg());
             }
-            if(!callResult.isSuccess()){
+            if (!callResult.isSuccess()) {
                 return callResult;
             }
             long start = System.currentTimeMillis();
             CallResult<T> cr= action.doAction();
             log.info("executeQuery datasource method run time:{}ms", System.currentTimeMillis() - start);
-            if (cr == null){
+            if (cr == null) {
                 return CallResult.fail(BusinessCodeEnum.CHECK_ACTION_NO_RESULT.getCode(), BusinessCodeEnum.CHECK_ACTION_NO_RESULT.getMsg());
             }
-            if (!cr.isSuccess()){
+            if (!cr.isSuccess()) {
                 return cr;
             }
-            if(cr.isSuccess()){
+            if (cr.isSuccess()) {
                 action.finishUp(cr);
             }
             return cr;
-        }catch(Exception e){
+        } catch(Exception e) {
             e.printStackTrace();
             log.error("executeQuery error", e);
             return CallResult.fail();

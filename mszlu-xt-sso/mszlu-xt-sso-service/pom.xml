@@ -22,5 +22,9 @@
             <groupId>com.mszlu.xt</groupId>
             <artifactId>mszlu-xt-sso-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.mszlu.xt</groupId>
+            <artifactId>mszlu-xt-common</artifactId>
+        </dependency>
     </dependencies>
 </project>
