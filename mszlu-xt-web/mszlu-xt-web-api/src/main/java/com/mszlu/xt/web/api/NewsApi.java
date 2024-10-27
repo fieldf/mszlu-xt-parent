@@ -1,6 +1,7 @@
 package com.mszlu.xt.web.api;
 
 
+import com.mszlu.xt.common.cache.Cache;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.web.model.params.NewsParam;
 import com.mszlu.xt.web.service.NewsService;
@@ -18,11 +19,13 @@ public class NewsApi {
     private NewsService newsService;
 
     @PostMapping("newsList")
+    @Cache(name = "newsList", time = 2 * 60)
     public CallResult newsList(@RequestBody NewsParam newsParam){
         return newsService.newsList(newsParam);
     }
 
     @PostMapping("detail")
+    @Cache(name = "newsDetail", time = 30)
     public CallResult news(@RequestBody NewsParam newsParam){
         return newsService.findNewsById(newsParam);
     }
