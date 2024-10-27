@@ -14,6 +14,7 @@
         <module>mszlu-xt-sso</module>
         <module>mszlu-xt-web</module>
         <module>mszlu-xt-common-pojo</module>
+        <module>mszlu-xt-admin</module>
     </modules>
 
     <parent>
