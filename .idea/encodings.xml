@@ -11,6 +11,14 @@
     <file url="file://$PROJECT_DIR$/mszlu-xt-sso/mszlu-xt-sso-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mszlu-xt-sso/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/mszlu-xt-sso/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/mszlu-xt-web-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/mszlu-xt-web-dao/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/mszlu-xt-web-domain/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/mszlu-xt-web-model/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/mszlu-xt-web-service-impl/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/mszlu-xt-web-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/mszlu-xt-web/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>
