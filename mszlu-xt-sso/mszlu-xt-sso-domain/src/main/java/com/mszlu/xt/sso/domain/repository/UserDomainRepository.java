@@ -35,4 +35,8 @@ public class UserDomainRepository {
         queryWrapper.eq(User::getUnionId, unionId).last("limit 1");
         return userMapper.selectOne(queryWrapper);
     }
+
+    public User findUserById(Long userId) {
+        return userMapper.selectById(userId);
+    }
 }

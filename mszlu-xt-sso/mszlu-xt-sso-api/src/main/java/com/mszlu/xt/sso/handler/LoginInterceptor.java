@@ -5,6 +5,7 @@ import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.sso.service.TokenService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Component
+@Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private TokenService tokenService;
@@ -33,6 +35,11 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("--------------------------login interceptor start--------------------------------");
+        log.info("request uri: {}", request.getRequestURI());
+        log.info("request method: {}", request.getMethod());
+        log.info("--------------------------login interceptor end--------------------------------");
+
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             returnJson(response);

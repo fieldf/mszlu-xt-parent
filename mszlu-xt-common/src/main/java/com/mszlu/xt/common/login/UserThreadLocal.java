@@ -7,7 +7,7 @@ public class UserThreadLocal {
         LOCAL.set(userId);
     }
 
-    public static Long get(Long userId) {
+    public static Long get() {
         return LOCAL.get();
     }
 

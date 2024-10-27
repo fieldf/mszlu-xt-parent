@@ -24,7 +24,7 @@ public class LoginDomain {
 
     private LoginParam loginParam;
 
-    private String secretKey = "mszlu!@#$%xtsso";
+    public static String secretKey = "mszlu!@#$%xtsso";
 
     public LoginDomain(LoginDomainRepository loginDomainRepository, LoginParam loginParam) {
         this.loginDomainRepository = loginDomainRepository;
@@ -105,7 +105,7 @@ public class LoginDomain {
             if (oldToken != null) {
                 // 当前用户之前在某一个设备登陆过
                 // 在用户登录验证的时候需要先验证token是否合法，然后去redis查询是否存在token 不存在代表不合法
-                loginDomainRepository.redisTemplate.delete(RedisKey.TOKEN + token);
+                loginDomainRepository.redisTemplate.delete(RedisKey.TOKEN + oldToken);
             }
             loginDomainRepository.redisTemplate.opsForValue().set(RedisKey.LOGIN_USER_TOKEN + user.getId(), token);
 
