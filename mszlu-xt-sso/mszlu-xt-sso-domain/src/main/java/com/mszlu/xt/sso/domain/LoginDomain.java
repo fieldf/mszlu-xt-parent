@@ -53,15 +53,17 @@ public class LoginDomain {
 
         try {
             // 2. 下次进行登录的时候 如果refreshToken存在 可以直接获取accessToken，不需要用户重新授权
-            String refreshToken = loginDomainRepository.redisTemplate.opsForValue().get(RedisKey.REFRESH_TOKEN);
+//            String refreshToken = loginDomainRepository.redisTemplate.opsForValue().get(RedisKey.REFRESH_TOKEN);
+            String refreshToken = null;
             WxMpOAuth2AccessToken wxMpOAuth2AccessToken = null;
             if (refreshToken == null) {
                 // 1. 通过code获取accessToken和refreshToken，
                 wxMpOAuth2AccessToken = loginDomainRepository.wxMpService.oauth2getAccessToken(code);
 
                 refreshToken = wxMpOAuth2AccessToken.getRefreshToken();
+                String unionId = wxMpOAuth2AccessToken.getUnionId();
                 // 需要保存refreshToken 保存在redis中 过期时间设置为28天
-                loginDomainRepository.redisTemplate.opsForValue().set(RedisKey.REFRESH_TOKEN, refreshToken, 28, TimeUnit.DAYS);
+                loginDomainRepository.redisTemplate.opsForValue().set(RedisKey.REFRESH_TOKEN + unionId, refreshToken, 28, TimeUnit.DAYS);
             } else {
                 wxMpOAuth2AccessToken = loginDomainRepository.wxMpService.oauth2refreshAccessToken(refreshToken);
             }
