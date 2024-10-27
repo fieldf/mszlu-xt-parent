@@ -8,13 +8,12 @@ import com.mszlu.xt.sso.dao.data.User;
 import com.mszlu.xt.sso.domain.repository.LoginDomainRepository;
 import com.mszlu.xt.sso.model.enums.LoginType;
 import com.mszlu.xt.sso.model.params.LoginParam;
-import jdk.nashorn.internal.codegen.CompilerConstants;
+import com.mszlu.xt.sso.model.params.UserParam;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -72,7 +71,8 @@ public class LoginDomain {
             String unionId = wxMpUser.getUnionId();
 
             // 4. 需要判断unionId在数据库中的user表中是否存在 存在就更新 最后登录时间 不存在就注册
-            User user = loginDomainRepository.findUserByUnionId(unionId);
+            User user = loginDomainRepository.createUserDomain(new UserParam()).findUserByUnionId(unionId);
+            boolean isNew = false;
             if (user == null) {
                 // 注册
                 user = new User();
@@ -93,7 +93,8 @@ public class LoginDomain {
                 user.setGrade("");
                 user.setName(wxMpUser.getNickname());
                 user.setSchool("");
-                loginDomainRepository.saveUser(user);
+                loginDomainRepository.createUserDomain(new UserParam()).saveUser(user);
+                isNew = true;
             }
             // 5. jwt技术 生成token 需要把token存储起来
             String token = JwtUtil.createJWT(7 * 24 * 60 * 60 * 1000, user.getId(), secretKey);
@@ -117,6 +118,11 @@ public class LoginDomain {
             // 8. 比如给用户 加积分，成就系统，任务系统
             // 9. 需要记录日志，记录当前用户的登录行为 MQ+mongo进行日志记录
 
+            // 10. 更新用户的最后登录时间
+            if (!isNew) {
+                user.setLastLoginTime(System.currentTimeMillis());
+                this.loginDomainRepository.createUserDomain(new UserParam()).updateUser(user);
+            }
             return CallResult.success();
         } catch (Exception e) {
             e.printStackTrace();
