@@ -17,11 +17,11 @@ public class ServiceTemplateImpl implements ServiceTemplate {
     public <T> CallResult<T> execute(TemplateAction<T> action) {
         try{
             CallResult<T> callResult = action.checkParam();
-            if(callResult==null){
+            if (callResult==null) {
                 log.warn("execute: Null result while checkParam");
                 return CallResult.fail(BusinessCodeEnum.CHECK_PARAM_NO_RESULT.getCode(), BusinessCodeEnum.CHECK_PARAM_NO_RESULT.getMsg());
             }
-            if(!callResult.isSuccess()){
+            if (!callResult.isSuccess()) {
                 return callResult;
             }
             callResult = action.checkBiz();
@@ -49,7 +49,7 @@ public class ServiceTemplateImpl implements ServiceTemplate {
                 action.finishUp(cr);
             }
             return cr;
-        } catch(Exception e) {
+        } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             e.printStackTrace();
             log.error("excute error", e);
@@ -59,7 +59,7 @@ public class ServiceTemplateImpl implements ServiceTemplate {
 
     @Override
     public <T> CallResult<T> executeQuery(TemplateAction<T> action) {
-        try{
+        try {
             CallResult<T> callResult = action.checkParam();
             if (callResult==null) {
                 log.warn("executeQuery: Null result while checkParam");

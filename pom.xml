@@ -13,6 +13,7 @@
         <module>mszlu-xt-common</module>
         <module>mszlu-xt-sso</module>
         <module>mszlu-xt-web</module>
+        <module>mszlu-xt-common-pojo</module>
     </modules>
 
     <parent>
