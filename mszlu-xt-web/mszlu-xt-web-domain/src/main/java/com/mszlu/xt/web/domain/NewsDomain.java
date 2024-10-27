@@ -87,4 +87,10 @@ public class NewsDomain {
         }
         return newsModelList;
     }
+
+    public CallResult<Object> findNewsById() {
+        News news = this.newsDomainRepository.findNewsById(newsParam.getId());
+        NewsModel newsModel = copy(news);
+        return CallResult.success(newsModel);
+    }
 }

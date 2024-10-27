@@ -33,7 +33,13 @@ public class NewsServiceImpl extends AbstractService implements NewsService {
 
     @Override
     public CallResult findNewsById(NewsParam newsParam) {
-        return null;
+        NewsDomain newsDomain = newsDomainRepository.createDomain(newsParam);
+        return this.serviceTemplate.executeQuery(new AbstractTemplateAction<Object>() {
+            @Override
+            public CallResult<Object> doAction() {
+                return newsDomain.findNewsById();
+            }
+        });
     }
 
     @Override

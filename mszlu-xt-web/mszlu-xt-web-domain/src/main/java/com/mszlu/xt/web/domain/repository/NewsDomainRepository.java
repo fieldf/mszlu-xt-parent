@@ -27,7 +27,11 @@ public class NewsDomainRepository {
         LambdaQueryWrapper<News> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(News::getTab, tab);
         queryWrapper.eq(News::getStatus, Status.NORMAL.getCode());
-        queryWrapper.select(News::getId, News::getTitle);
+        queryWrapper.select(News::getId, News::getTitle, News::getImageUrl);
         return newsMapper.selectPage(page, queryWrapper);
+    }
+
+    public News findNewsById(Long id) {
+        return newsMapper.selectById(id);
     }
 }
