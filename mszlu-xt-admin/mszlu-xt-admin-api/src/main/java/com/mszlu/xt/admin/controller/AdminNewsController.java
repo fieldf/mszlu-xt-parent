@@ -20,20 +20,20 @@ public class AdminNewsController {
     private NewsService newsService;
 
 
-//    @RequestMapping(value = "save")
-//    public CallResult save(@RequestBody NewsParam newsParam){
-//        return newsService.save(newsParam);
-//    }
-//
-//    @RequestMapping(value = "update")
-//    public CallResult update(@RequestBody NewsParam newsParam){
-//        return newsService.update(newsParam);
-//    }
-//
-//    @RequestMapping(value = "findNewsById")
-//    public CallResult findNewsById(@RequestBody NewsParam newsParam){
-//        return newsService.findNewsById(newsParam);
-//    }
+    @RequestMapping(value = "save")
+    public CallResult save(@RequestBody NewsParam newsParam){
+        return newsService.save(newsParam);
+    }
+
+    @RequestMapping(value = "update")
+    public CallResult update(@RequestBody NewsParam newsParam){
+        return newsService.update(newsParam);
+    }
+
+    @PostMapping(value = "findNewsById")
+    public CallResult findNewsById(@RequestBody NewsParam newsParam){
+        return newsService.findNewsById(newsParam);
+    }
 
 
     @PostMapping(value = "findPage")

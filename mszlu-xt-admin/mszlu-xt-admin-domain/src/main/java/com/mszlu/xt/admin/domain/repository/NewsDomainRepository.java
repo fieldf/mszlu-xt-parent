@@ -36,4 +36,16 @@ public class NewsDomainRepository {
         }
         return newsMapper.selectPage(page, queryWrapper);
     }
+
+    public void save(News news) {
+        this.newsMapper.insert(news);
+    }
+
+    public News findNewsById(Long id) {
+        return newsMapper.selectById(id);
+    }
+
+    public void update(News news) {
+        this.newsMapper.updateById(news);
+    }
 }

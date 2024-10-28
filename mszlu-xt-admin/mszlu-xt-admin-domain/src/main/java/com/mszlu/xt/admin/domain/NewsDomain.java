@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mszlu.xt.admin.domain.repository.NewsDomainRepository;
 import com.mszlu.xt.admin.model.NewsModel;
 import com.mszlu.xt.admin.params.NewsParam;
+import com.mszlu.xt.common.enums.Status;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.model.ListPageModel;
 import com.mszlu.xt.pojo.News;
@@ -63,5 +64,26 @@ public class NewsDomain {
             newsModelList.add(copy(news));
         }
         return newsModelList;
+    }
+
+    public CallResult<Object> save() {
+        News news = new News();
+        BeanUtils.copyProperties(this.newsParam, news);
+        news.setCreateTime(System.currentTimeMillis());
+        news.setStatus(Status.NORMAL.getCode());
+        this.newsDomainRepository.save(news);
+        return CallResult.success();
+    }
+
+    public CallResult<Object> findNewsById() {
+        News news = newsDomainRepository.findNewsById(this.newsParam.getId());
+        return CallResult.success(news);
+    }
+
+    public CallResult<Object> update() {
+        News news = new News();
+        BeanUtils.copyProperties(this.newsParam, news);
+        this.newsDomainRepository.update(news);
+        return CallResult.success();
     }
 }
