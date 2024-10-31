@@ -7,12 +7,17 @@ import com.mszlu.xt.admin.params.NewsParam;
 import com.mszlu.xt.common.enums.Status;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.model.ListPageModel;
+import com.mszlu.xt.common.utils.QiniuUtils;
 import com.mszlu.xt.pojo.News;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class NewsDomain {
 
@@ -85,5 +90,32 @@ public class NewsDomain {
         BeanUtils.copyProperties(this.newsParam, news);
         this.newsDomainRepository.update(news);
         return CallResult.success();
+    }
+
+    public CallResult upload(MultipartFile file) {
+
+        String accessKey = this.newsDomainRepository.qiniuConfig.getAccessKey();
+        String accessSecret = this.newsDomainRepository.qiniuConfig.getAccessSecret();
+        String bucket = this.newsDomainRepository.qiniuConfig.getBucket();
+        String originalFilename = file.getOriginalFilename();
+        // yyyy-MM-dd
+        DateTime dateTime = new DateTime();
+        String fileName = "xt/news/"
+                + dateTime.toString("yyyy")+"/"
+                + dateTime.toString("MM")+"/"
+                + UUID.randomUUID() +"."
+                + StringUtils.substringAfterLast(originalFilename,".");
+
+        try {
+            boolean upload = QiniuUtils.upload(accessKey, accessSecret, bucket, file.getBytes(), fileName);
+
+            if (upload) {
+                return CallResult.success(this.newsDomainRepository.qiniuConfig.getFileServerUrl() + fileName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return CallResult.fail(-999, "图片上传失败");
+        }
+        return null;
     }
 }

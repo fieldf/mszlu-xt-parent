@@ -10,4 +10,14 @@ public class QiniuConfig {
 
     @Value("${qiniu.file.server.url}")
     private String fileServerUrl;
+
+    @Value("${qiniu.accessKey}")
+    private String accessKey;
+
+    @Value("${qiniu.accessSecret}")
+    private String accessSecret;
+
+    @Value("${qiniu.bucket}")
+    private String bucket;
+
 }

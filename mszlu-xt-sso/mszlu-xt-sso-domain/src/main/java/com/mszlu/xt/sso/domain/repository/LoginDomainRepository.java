@@ -1,10 +1,8 @@
 package com.mszlu.xt.sso.domain.repository;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mszlu.xt.common.constants.RedisKey;
 import com.mszlu.xt.common.wx.config.WxOpenConfig;
 import com.mszlu.xt.sso.dao.UserMapper;
-import com.mszlu.xt.sso.dao.data.User;
 import com.mszlu.xt.sso.domain.LoginDomain;
 import com.mszlu.xt.sso.domain.UserDomain;
 import com.mszlu.xt.sso.model.params.LoginParam;
