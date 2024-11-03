@@ -2,6 +2,8 @@ package com.mszlu.xt.admin.model;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author Jarno
  */
@@ -12,6 +14,8 @@ public class SubjectModel {
     private String subjectGrade;
     private String subjectTerm;
     private Integer status;
+
+    private List<Integer> subjectUnits;
 
     public void fillSubjectName() {
         this.subjectName = this.subjectName + "-" + this.subjectGrade + "-" + this.subjectTerm;

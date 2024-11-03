@@ -29,4 +29,14 @@ public class AdminSubjectController {
     public CallResult saveSubject(@RequestBody SubjectParam subjectParam) {
         return subjectService.saveSubject(subjectParam);
     }
+
+    @PostMapping(value = "findSubjectById")
+    public CallResult findSubjectById(@RequestBody SubjectParam subjectParam) {
+        return subjectService.findSubjectById(subjectParam);
+    }
+
+    @PostMapping(value = "updateSubject")
+    public CallResult updateSubject(@RequestBody SubjectParam subjectParam) {
+        return subjectService.updateSubject(subjectParam);
+    }
 }
