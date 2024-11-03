@@ -8,6 +8,7 @@ import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.service.AbstractTemplateAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SubjectServiceImpl extends AbstractService implements SubjectService {
@@ -21,6 +22,28 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
             @Override
             public CallResult<Object> doAction() {
                 return subjectDomain.findSubjectList();
+            }
+        });
+    }
+
+    @Override
+    @Transactional
+    public CallResult saveSubject(SubjectParam subjectParam) {
+        SubjectDomain subjectDomain = this.subjectDomainRepository.createDomain(subjectParam);
+        return this.serviceTemplate.execute(new AbstractTemplateAction<Object>() {
+            @Override
+            public CallResult<Object> checkParam() {
+                return subjectDomain.checkSaveSubjectParam();
+            }
+
+            @Override
+            public CallResult<Object> checkBiz() {
+                return subjectDomain.checkSaveSubjectBiz();
+            }
+
+            @Override
+            public CallResult<Object> doAction() {
+                return subjectDomain.saveSubject();
             }
         });
     }

@@ -16,4 +16,5 @@ public interface SubjectService {
      */
     CallResult findSubjectList(SubjectParam subjectParam);
 
+    CallResult saveSubject(SubjectParam subjectParam);
 }

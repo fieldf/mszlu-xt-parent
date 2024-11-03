@@ -24,4 +24,9 @@ public class AdminSubjectController {
     public CallResult findPage(@RequestBody SubjectParam subjectParam){
         return  subjectService.findSubjectList(subjectParam);
     }
+
+    @PostMapping(value = "saveSubject")
+    public CallResult saveSubject(@RequestBody SubjectParam subjectParam) {
+        return subjectService.saveSubject(subjectParam);
+    }
 }
