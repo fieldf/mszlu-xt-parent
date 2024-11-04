@@ -76,4 +76,8 @@ public class SubjectDomainRepository {
         queryWrapper.eq(SubjectUnit::getSubjectId, id);
         this.subjectUnitMapper.delete(queryWrapper);
     }
+
+    public List<Subject> findAll() {
+        return subjectMapper.selectList(new LambdaQueryWrapper<>());
+    }
 }

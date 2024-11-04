@@ -39,4 +39,9 @@ public class AdminSubjectController {
     public CallResult updateSubject(@RequestBody SubjectParam subjectParam) {
         return subjectService.updateSubject(subjectParam);
     }
+
+    @PostMapping(value = "allSubjectList")
+    public CallResult allSubjectList(@RequestBody SubjectParam subjectParam) {
+        return subjectService.allSubjectList(subjectParam);
+    }
 }

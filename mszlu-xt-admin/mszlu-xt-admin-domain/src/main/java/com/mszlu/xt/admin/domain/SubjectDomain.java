@@ -135,4 +135,9 @@ public class SubjectDomain {
         }
         return CallResult.success();
     }
+
+    public CallResult<Object> allSubjectList() {
+        List<Subject> subjectList = subjectDomainRepository.findAll();
+        return CallResult.success(copyList(subjectList));
+    }
 }

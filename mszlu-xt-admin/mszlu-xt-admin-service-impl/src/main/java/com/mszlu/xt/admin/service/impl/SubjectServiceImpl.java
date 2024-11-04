@@ -74,4 +74,15 @@ public class SubjectServiceImpl extends AbstractService implements SubjectServic
             }
         });
     }
+
+    @Override
+    public CallResult allSubjectList(SubjectParam subjectParam) {
+        SubjectDomain subjectDomain = this.subjectDomainRepository.createDomain(subjectParam);
+        return this.serviceTemplate.executeQuery(new AbstractTemplateAction<Object>() {
+            @Override
+            public CallResult<Object> doAction() {
+                return subjectDomain.allSubjectList();
+            }
+        });
+    }
 }

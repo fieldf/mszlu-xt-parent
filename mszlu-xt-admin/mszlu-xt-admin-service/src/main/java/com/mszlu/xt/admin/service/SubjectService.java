@@ -31,4 +31,6 @@ public interface SubjectService {
      * @return
      */
     CallResult updateSubject(SubjectParam subjectParam);
+
+    CallResult allSubjectList(SubjectParam subjectParam);
 }
