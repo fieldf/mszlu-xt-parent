@@ -138,6 +138,12 @@ public class SubjectDomain {
 
     public CallResult<Object> allSubjectList() {
         List<Subject> subjectList = subjectDomainRepository.findAll();
-        return CallResult.success(copyList(subjectList));
+        List<SubjectModel> result = copyList(subjectList);
+        result.forEach(SubjectModel::fillSubjectName);
+        return CallResult.success(result);
+    }
+
+    public List<Subject> findAllSubjectList() {
+        return subjectDomainRepository.findAll();
     }
 }
