@@ -19,6 +19,8 @@
         <module>mszlu-xt-sso-dao</module>
         <module>mszlu-xt-sso-domain</module>
         <module>mszlu-xt-sso-model</module>
+        <module>mszlu-xt-sso-dubbo-service</module>
+        <module>mszlu-xt-sso-provider</module>
     </modules>
 
     <properties>
