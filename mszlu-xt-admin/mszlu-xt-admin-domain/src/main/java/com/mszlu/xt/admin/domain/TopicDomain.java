@@ -81,4 +81,23 @@ public class TopicDomain {
         listModel.setSize(topicList.getTotal());
         return CallResult.success(listModel);
     }
+
+    public TopicModel findTopicByTitle() {
+        Topic topic = this.topicDomainRepository.findTopicByTitle(this.topicParam.getTopicTitle());
+        return copy(topic);
+    }
+
+    public CallResult<Object> updateTopic() {
+        Topic topic = new Topic();
+        BeanUtils.copyProperties(this.topicParam, topic);
+        this.topicDomainRepository.update(topic);
+        return CallResult.success();
+    }
+
+    public CallResult<Object> saveTopic() {
+        Topic topic = new Topic();
+        BeanUtils.copyProperties(this.topicParam, topic);
+        this.topicDomainRepository.save(topic);
+        return CallResult.success();
+    }
 }
