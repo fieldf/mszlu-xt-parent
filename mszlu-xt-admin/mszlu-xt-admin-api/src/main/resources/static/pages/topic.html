@@ -811,7 +811,7 @@
                 },
                 handleJudgeAdd () {
                     this.formData["topicImg"] = this.imageUrl;
-                    axios.post("/lzadmin/topic/saveJudgeTopic",this.formData).then((res)=>{
+                    axios.post("/admin/topic/saveJudgeTopic",this.formData).then((res)=>{
                         if (res.data.success){
                             this.$message({
                                 message: '恭喜你，添加成功',
@@ -851,7 +851,7 @@
                 handleFBCreate() {
                     this.resetForm();
                     this.dialogFillBlankFormVisible = true;
-                    axios.post("/lzadmin/subject/allSubjectList",{"page":1}).then((res)=>{
+                    axios.post("/admin/subject/allSubjectList",{"page":1}).then((res)=>{
                         if (res.data.success){
                             this.subjectList = res.data.result.list;
                         }
@@ -873,7 +873,7 @@
                 handleRadioCreate() {
                     this.resetForm();
                     this.dialogRadioFormVisible = true;
-                    axios.post("/lzadmin/subject/allSubjectList",{"page":1}).then((res)=>{
+                    axios.post("/admin/subject/allSubjectList",{"page":1}).then((res)=>{
                         if (res.data.success){
                             this.subjectList = res.data.result.list;
                         }
@@ -883,7 +883,7 @@
                 handleMulCreate() {
                     this.resetForm();
                     this.dialogMulFormVisible = true;
-                    axios.post("/lzadmin/subject/allSubjectList",{"page":1}).then((res)=>{
+                    axios.post("/admin/subject/allSubjectList",{"page":1}).then((res)=>{
                         if (res.data.success){
                             this.subjectList = res.data.result.list;
                         }
@@ -893,7 +893,7 @@
                 handleQACreate() {
                     this.resetForm();
                     this.dialogQAFormVisible = true;
-                    axios.post("/lzadmin/subject/allSubjectList",{"page":1}).then((res)=>{
+                    axios.post("/admin/subject/allSubjectList",{"page":1}).then((res)=>{
                         if (res.data.success){
                             this.subjectList = res.data.result.list;
                         }
@@ -903,7 +903,7 @@
                 handleJudgeCreate() {
                     this.resetForm();
                     this.dialogJudgeFormVisible = true;
-                    axios.post("/lzadmin/subject/allSubjectList",{"page":1}).then((res)=>{
+                    axios.post("/admin/subject/allSubjectList",{"page":1}).then((res)=>{
                         if (res.data.success){
                             this.subjectList = res.data.result.list;
                         }
@@ -920,7 +920,7 @@
                 // 删除
                 handleDelete(row) {
                     this.$confirm("是否确定删除，一旦删除不可恢复?").then(()=>{
-                        axios.post("/lzadmin/topic/deleteById",{"id":row.id}).then((res)=>{
+                        axios.post("/admin/topic/deleteById",{"id":row.id}).then((res)=>{
                             if (res.data.success){
                                 this.$message({
                                     type: 'info',
