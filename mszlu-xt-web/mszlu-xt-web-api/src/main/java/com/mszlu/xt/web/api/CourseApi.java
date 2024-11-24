@@ -2,16 +2,19 @@ package com.mszlu.xt.web.api;
 
 import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.CallResult;
+import com.mszlu.xt.web.model.params.CourseParam;
+import com.mszlu.xt.web.service.CourseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("course")
 public class CourseApi {
-
-    @GetMapping(value = "login")
-    public CallResult courseList(){
-
-        return CallResult.success(UserThreadLocal.get());
+    @Autowired
+    private CourseService courseService;
+    @PostMapping(value = "courseList")
+    public CallResult courseList(@RequestBody CourseParam courseParam){
+        return courseService.courseList(courseParam);
     }
 }
