@@ -80,4 +80,9 @@ public class SubjectDomain {
         map.put("subjectTermList", subjectTermList);
         return CallResult.success(map);
     }
+
+    public List<SubjectModel> findSubjectListByCourseId(Long courseId) {
+        List<Subject> subjectList = subjectDomainRepository.findSubjectListByCourseId(courseId);
+        return copyList(subjectList);
+    }
 }

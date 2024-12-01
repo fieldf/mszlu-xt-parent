@@ -1,6 +1,7 @@
 package com.mszlu.xt.web.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.mszlu.xt.common.annontation.NoAuth;
 import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.Cookie;
@@ -43,10 +45,17 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.info("request method: {}", request.getMethod());
         log.info("--------------------------login interceptor end--------------------------------");
 
+        boolean isAuth = false;
+
+        if (handler instanceof HandlerMethod) {
+            // 代表拦截的方法是Controller的方法
+            HandlerMethod handlerMethod = (HandlerMethod) handler;
+            isAuth = handlerMethod.hasMethodAnnotation(NoAuth.class);
+        }
+
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            returnJson(response);
-            return false;
+            return handlerResponse(response, isAuth);
         }
         String token = null;
         for (Cookie cookie : cookies) {
@@ -56,17 +65,24 @@ public class LoginInterceptor implements HandlerInterceptor {
             }
         }
         if (StringUtils.isBlank(token)) {
-            returnJson(response);
-            return false;
+            return handlerResponse(response, isAuth);
         }
         Long userId = tokenService.checkToken(token);
         if (userId == null) {
-            returnJson(response);
-            return false;
+            return handlerResponse(response, isAuth);
         }
 
         UserThreadLocal.put(userId);
         return true;
+    }
+
+    private boolean handlerResponse(HttpServletResponse response, boolean isAuth) {
+        if (isAuth) {
+            return true;
+        } else {
+            returnJson(response);
+            return false;
+        }
     }
 
     @Override

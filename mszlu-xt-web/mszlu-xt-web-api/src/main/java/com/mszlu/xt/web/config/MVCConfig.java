@@ -26,7 +26,6 @@ public class MVCConfig implements WebMvcConfigurer {
                 .addPathPatterns("/order/*")
                 .addPathPatterns("/user/*")
                 .addPathPatterns("/i/*")
-                .excludePathPatterns("/course/courseList")
                 .excludePathPatterns("/subject/listSubjectNew")
                 .excludePathPatterns("/course/subjectInfo")
                 .excludePathPatterns("/order/notify")

@@ -29,4 +29,8 @@ public class SubjectDomainRepository {
         queryWrapper.eq(Subject::getStatus, Status.NORMAL.getCode());
         return subjectMapper.selectList(queryWrapper);
     }
+
+    public List<Subject> findSubjectListByCourseId(Long courseId) {
+        return subjectMapper.findSubjectListByCourseId(courseId);
+    }
 }

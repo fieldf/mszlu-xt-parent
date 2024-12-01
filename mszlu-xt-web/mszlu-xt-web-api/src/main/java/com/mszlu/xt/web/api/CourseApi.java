@@ -1,5 +1,6 @@
 package com.mszlu.xt.web.api;
 
+import com.mszlu.xt.common.annontation.NoAuth;
 import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.web.model.params.CourseParam;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class CourseApi {
     @Autowired
     private CourseService courseService;
+    @NoAuth
     @PostMapping(value = "courseList")
     public CallResult courseList(@RequestBody CourseParam courseParam){
         return courseService.courseList(courseParam);
