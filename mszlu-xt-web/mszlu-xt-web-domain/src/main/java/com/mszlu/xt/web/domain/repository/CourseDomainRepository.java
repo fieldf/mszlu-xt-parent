@@ -51,4 +51,8 @@ public class CourseDomainRepository {
     public SubjectDomain createSubjectDomain(SubjectParam subjectParam) {
         return subjectDomainRepository.createDomain(subjectParam);
     }
+
+    public Course findCourseById(Long courseId) {
+        return courseMapper.selectById(courseId);
+    }
 }

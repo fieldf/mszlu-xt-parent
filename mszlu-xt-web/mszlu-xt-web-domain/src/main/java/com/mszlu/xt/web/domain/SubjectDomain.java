@@ -7,6 +7,7 @@ import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.model.ListPageModel;
 import com.mszlu.xt.common.utils.CommonUtils;
 import com.mszlu.xt.pojo.Subject;
+import com.mszlu.xt.pojo.SubjectUnit;
 import com.mszlu.xt.web.domain.repository.SubjectDomainRepository;
 import com.mszlu.xt.web.model.SubjectModel;
 import com.mszlu.xt.web.model.params.SubjectParam;
@@ -84,5 +85,10 @@ public class SubjectDomain {
     public List<SubjectModel> findSubjectListByCourseId(Long courseId) {
         List<Subject> subjectList = subjectDomainRepository.findSubjectListByCourseId(courseId);
         return copyList(subjectList);
+    }
+
+    public List<Integer> findSubjectUnitBySubjectId(Long subjectId) {
+        List<SubjectUnit> subjectUnitList = this.subjectDomainRepository.findUnitBySubjectId(subjectId);
+        return subjectUnitList.stream().map(SubjectUnit::getSubjectUnit).collect(Collectors.toList());
     }
 }

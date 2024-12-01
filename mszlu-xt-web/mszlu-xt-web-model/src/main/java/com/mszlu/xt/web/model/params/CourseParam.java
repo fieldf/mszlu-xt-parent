@@ -26,6 +26,7 @@ public class CourseParam {
     private String subjectGrade;
     private String subjectTerm;
 
+    // 课程id
     private Long courseId;
     private String imageUrl;
 }
