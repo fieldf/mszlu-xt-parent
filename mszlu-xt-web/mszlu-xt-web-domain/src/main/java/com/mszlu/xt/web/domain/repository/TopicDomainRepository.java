@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.mszlu.xt.pojo.Topic;
+import com.mszlu.xt.pojo.UserPractice;
 import com.mszlu.xt.web.dao.TopicMapper;
 import com.mszlu.xt.web.dao.data.TopicDTO;
 import com.mszlu.xt.web.domain.*;
 import com.mszlu.xt.web.model.params.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,7 +74,14 @@ public class TopicDomainRepository {
         return subjectDomainRepository.createDomain(subjectParam);
     }
 
-    public TopicDTO findTopicAnswer(Long topicId, Long userHistoryId) {
-        return this.topicMapper.findTopicAnswer(topicId,userHistoryId);
+    public TopicDTO findTopicAnswer(Long topicId, Long userId, Long userHistoryId) {
+        TopicDTO topicDTO = new TopicDTO();
+        Topic topic = this.topicMapper.selectById(topicId);
+        UserPractice userPractice = this.userPracticeDomainRepository.createDomain(null).findUserPracticeByTopicId(userId, topicId, userHistoryId);
+        BeanUtils.copyProperties(topic, topicDTO);
+        topicDTO.setUserAnswer(userPractice.getUserAnswer());
+        topicDTO.setPStatus(userPractice.getPStatus());
+        return topicDTO;
+//        return this.topicMapper.findTopicAnswer(topicId,userId, userHistoryId);
     }
 }

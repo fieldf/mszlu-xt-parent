@@ -87,7 +87,7 @@ public class TopicDomain {
             return CallResult.fail();
         }
         System.out.println("已有练习题："+topicId);
-        TopicDTO topic = this.topicDomainRepository.findTopicAnswer(topicId, userHistory.getId());
+        TopicDTO topic = this.topicDomainRepository.findTopicAnswer(topicId, userId, userHistory.getId());
         PracticeDetailModel practiceModel = new PracticeDetailModel();
         practiceModel.setProgress(progress);
         practiceModel.setTotal(userHistory.getTopicTotal());
@@ -162,7 +162,7 @@ public class TopicDomain {
             this.topicDomainRepository.createUserPracticeDomain(null).saveUserPractice(userPractice);
         }
 
-        TopicDTO topic = this.topicDomainRepository.findTopicAnswer(topicIdList.get(0), userHistory.getId());
+        TopicDTO topic = this.topicDomainRepository.findTopicAnswer(topicIdList.get(0), userId, userHistory.getId());
 
         PracticeDetailModel practiceModel = new PracticeDetailModel();
         practiceModel.setTotal(userHistory.getTopicTotal());

@@ -27,7 +27,10 @@
     </resultMap>
 
     <select id="findTopicAnswer" parameterType="java.util.Map" resultMap="TopicAnswerMap">
-        select t.*,up.p_status,up.user_answer from t_topic t, t_user_practice up where t.id=up.topic_id and t.id=#{topicId} and up.history_id=#{userHistoryId} LIMIT 1
+        select t.*,up.p_status,up.user_answer
+        from (select * from t_user_practice where user_id=#{userId} and topic_id=#{topicId} and history_id=#{userHistoryId}) up, t_topic t
+        where up.topic_id=t.id
+         LIMIT 1
     </select>
 
 </mapper>
