@@ -43,4 +43,8 @@ public class SubjectDomainRepository {
         queryWrapper.eq(SubjectUnit::getSubjectId, subjectId);
         return subjectUnitMapper.selectList(queryWrapper);
     }
+
+    public Subject findSubjectById(Long subjectId) {
+        return subjectMapper.selectById(subjectId);
+    }
 }

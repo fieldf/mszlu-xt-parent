@@ -1,5 +1,6 @@
 package com.mszlu.xt.web.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.BusinessCodeEnum;
@@ -7,10 +8,12 @@ import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.model.ListPageModel;
 import com.mszlu.xt.pojo.Course;
 import com.mszlu.xt.pojo.UserCourse;
+import com.mszlu.xt.pojo.UserHistory;
 import com.mszlu.xt.web.domain.repository.CourseDomainRepository;
 import com.mszlu.xt.web.model.CourseViewModel;
 import com.mszlu.xt.web.model.SubjectModel;
 import com.mszlu.xt.web.model.SubjectViewModel;
+import com.mszlu.xt.web.model.enums.HistoryStatus;
 import com.mszlu.xt.web.model.params.CourseParam;
 import com.mszlu.xt.web.model.params.SubjectParam;
 import com.mszlu.xt.web.model.params.UserCourseParam;
@@ -115,6 +118,8 @@ public class CourseDomain {
          * 3. 返回对应的模型数据即可
          * 4. 不做的业务逻辑(如果此课程的学科已经在学习中，返回已经当初选择的单元)
          */
+        Long userId = UserThreadLocal.get();
+
 
         Long courseId = courseParam.getCourseId();
         List<SubjectModel> subjectModelList = this.courseDomainRepository.createSubjectDomain(null).findSubjectListByCourseId(courseId);
@@ -130,16 +135,16 @@ public class CourseDomain {
             List<Integer> subjectUnitList = this.courseDomainRepository.createSubjectDomain(null).findSubjectUnitBySubjectId(subjectModel.getId());
             subjectViewModel.setSubjectUnitList(subjectUnitList);
 
-            //            if (userId != null){
-//                UserHistory userHistory = this.courseDomainRepository.createTopicDomain(null).findUserHistory(userId, subject.getId(), HistoryStatus.NO_FINISH.getCode());
-//                if (userHistory != null) {
-//                    String subjectUnits = userHistory.getSubjectUnits();
-//                    if (StringUtils.isNotEmpty(subjectUnits)) {
-//                        List<Integer> strings = JSON.parseArray(subjectUnits, Integer.class);
-//                        subjectViewModel.setSubjectUnitSelectedList(strings);
-//                    }
-//                }
-//            }
+            if (userId != null){
+                UserHistory userHistory = this.courseDomainRepository.createUserHistoryDomain(null).findUserHistory(userId, subjectModel.getId(), HistoryStatus.NO_FINISH.getCode());
+                if (userHistory != null) {
+                    String subjectUnits = userHistory.getSubjectUnits();
+                    if (StringUtils.isNotEmpty(subjectUnits)) {
+                        List<Integer> strings = JSON.parseArray(subjectUnits, Integer.class);
+                        subjectViewModel.setSubjectUnitSelectedList(strings);
+                    }
+                }
+            }
 
             subjectViewModelList.add(subjectViewModel);
         }
@@ -154,5 +159,9 @@ public class CourseDomain {
             return CallResult.fail(BusinessCodeEnum.TOPIC_PARAM_ERROR.getCode(),"参数错误");
         }
         return CallResult.success();
+    }
+
+    public List<Long> findCourseIdListBySubjectId(Long subjectId) {
+        return courseDomainRepository.findCourseIdListBySubjectId(subjectId);
     }
 }

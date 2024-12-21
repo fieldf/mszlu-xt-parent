@@ -91,4 +91,11 @@ public class SubjectDomain {
         List<SubjectUnit> subjectUnitList = this.subjectDomainRepository.findUnitBySubjectId(subjectId);
         return subjectUnitList.stream().map(SubjectUnit::getSubjectUnit).collect(Collectors.toList());
     }
+
+    public SubjectModel findSubject(Long subjectId) {
+        Subject subject = subjectDomainRepository.findSubjectById(subjectId);
+        SubjectModel target = new SubjectModel();
+        BeanUtils.copyProperties(subject, target);
+        return target;
+    }
 }

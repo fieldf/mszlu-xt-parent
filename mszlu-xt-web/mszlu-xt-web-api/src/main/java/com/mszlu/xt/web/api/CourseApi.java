@@ -17,7 +17,7 @@ public class CourseApi {
     private CourseService courseService;
     @NoAuth
     @PostMapping(value = "courseList")
-    @Cache(name = "web_courseList", time = 5 * 60 *1000, hasUser = true)
+//    @Cache(name = "web_courseList", time = 5 * 60 *1000, hasUser = true)
     public CallResult courseList(@RequestBody CourseParam courseParam){
         return courseService.courseList(courseParam);
     }
