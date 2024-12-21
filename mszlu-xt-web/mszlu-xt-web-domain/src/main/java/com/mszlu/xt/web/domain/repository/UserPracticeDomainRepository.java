@@ -2,6 +2,7 @@ package com.mszlu.xt.web.domain.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.mszlu.xt.pojo.UserPractice;
 import com.mszlu.xt.web.dao.UserPracticeMapper;
@@ -61,5 +62,17 @@ public class UserPracticeDomainRepository {
         queryWrapper.eq(UserPractice::getHistoryId,userHistoryId);
         queryWrapper.eq(UserPractice::getTopicId,topicId);
         return userPracticeMapper.selectOne(queryWrapper);
+    }
+
+    public void updateUserPractice(Long userHistoryId, Long topicId, Long userId, String answer, int pStatus) {
+        LambdaUpdateWrapper<UserPractice> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper
+                .eq(UserPractice::getUserId,userId)
+                .eq(UserPractice::getHistoryId,userHistoryId)
+                .eq(UserPractice::getTopicId,topicId);
+        updateWrapper.set(UserPractice::getUserAnswer,answer);
+        // 1 错误 2 正确
+        updateWrapper.set(UserPractice::getPStatus,pStatus);
+        userPracticeMapper.update(null, updateWrapper);
     }
 }

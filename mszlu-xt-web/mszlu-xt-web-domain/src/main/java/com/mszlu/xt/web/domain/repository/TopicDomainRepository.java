@@ -34,6 +34,9 @@ public class TopicDomainRepository {
     @Autowired
     private SubjectDomainRepository subjectDomainRepository;
 
+    @Autowired
+    private UserProblemDomainRepository userProblemDomainRepository;
+
     @Resource
     private TopicMapper topicMapper;
 
@@ -83,5 +86,17 @@ public class TopicDomainRepository {
         topicDTO.setPStatus(userPractice.getPStatus());
         return topicDTO;
 //        return this.topicMapper.findTopicAnswer(topicId,userId, userHistoryId);
+    }
+
+    public Topic findTopicById(Long topicId) {
+        return topicMapper.selectById(topicId);
+    }
+
+    public UserHistoryDomain createHistoryDomain(UserHistoryParam userHistoryParam) {
+        return userHistoryDomainRepository.createDomain(userHistoryParam);
+    }
+
+    public UserProblemDomain createUserProblem(UserProblemParam userProblemParam) {
+        return userProblemDomainRepository.createDomain(userProblemParam);
     }
 }

@@ -5,4 +5,8 @@ import com.mszlu.xt.web.model.params.TopicParam;
 
 public interface TopicService {
     CallResult practice(TopicParam topicParam);
+
+    CallResult submit(TopicParam topicParam);
+
+    CallResult jump(TopicParam topicParam);
 }

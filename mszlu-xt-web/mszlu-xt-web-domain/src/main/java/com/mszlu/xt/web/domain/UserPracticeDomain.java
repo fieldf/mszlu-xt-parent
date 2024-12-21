@@ -1,8 +1,6 @@
 package com.mszlu.xt.web.domain;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mszlu.xt.pojo.UserPractice;
-import com.mszlu.xt.web.dao.UserPracticeMapper;
 import com.mszlu.xt.web.domain.repository.UserPracticeDomainRepository;
 import com.mszlu.xt.web.model.params.UserPracticeParam;
 
@@ -44,5 +42,9 @@ public class UserPracticeDomain {
 
     public UserPractice findUserPracticeByTopicId(Long userId, Long topicId, Long userHistoryId) {
         return userPracticeDomainRepository.findUserPracticeByTopicId(userId, topicId, userHistoryId);
+    }
+
+    public void updateUserPractice(Long userHistoryId, Long topicId, Long userId, String answer, int pStatus) {
+        userPracticeDomainRepository.updateUserPractice(userHistoryId,topicId,userId,answer,pStatus);
     }
 }

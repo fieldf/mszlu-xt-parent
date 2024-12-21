@@ -9,7 +9,7 @@ import java.util.Map;
 public class PracticeDetailModel {
     private TopicModelView topic;
     private Integer total;
-    private Long practiceId;
+    private String practiceId;
     private String createTime;
     private String finishTime;
     private String useTime;

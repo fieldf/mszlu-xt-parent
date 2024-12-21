@@ -12,8 +12,8 @@ import java.util.Map;
  */
 @Data
 public class TopicModelView {
-
-    private Long id;
+    // 前端的js接收数值类型的时候 不能接收过长的数值 js 范围比long小 精度损失问题
+    private String id;
 
     private String topicTitle;
 

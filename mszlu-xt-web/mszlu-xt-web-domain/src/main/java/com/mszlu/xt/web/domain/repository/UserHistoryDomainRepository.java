@@ -2,6 +2,8 @@ package com.mszlu.xt.web.domain.repository;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.mszlu.xt.pojo.UserHistory;
 import com.mszlu.xt.web.dao.UserHistoryMapper;
@@ -28,11 +30,40 @@ public class UserHistoryDomainRepository {
         return userHistoryMapper.selectOne(queryWrapper);
     }
 
-    public UserHistory findUserHistoryById(Long id) {
-        return userHistoryMapper.selectById(id);
+    public UserHistory findUserHistoryById(Long userId, Long practiceId) {
+        LambdaQueryWrapper<UserHistory> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserHistory::getUserId,userId);
+        queryWrapper.eq(UserHistory::getId,practiceId);
+        return userHistoryMapper.selectOne(queryWrapper);
     }
 
     public void save(UserHistory userHistory) {
         userHistoryMapper.insert(userHistory);
+    }
+
+    public void updateUserHistoryErrorCount(Long userHistoryId) {
+        UpdateWrapper<UserHistory> update = Wrappers.update();
+        update.eq("id",userHistoryId);
+        update.setSql(true,"error_count=error_count+1");
+        this.userHistoryMapper.update(null, update);
+    }
+
+    public void updateUserHistoryStatus(Long historyId, int historyStatus, long finishTime) {
+        LambdaUpdateWrapper<UserHistory> update = Wrappers.lambdaUpdate();
+        update.eq(UserHistory::getId,historyId);
+        update.set(UserHistory::getHistoryStatus,historyStatus);
+        update.set(UserHistory::getFinishTime,finishTime);
+        this.userHistoryMapper.update(null, update);
+    }
+
+
+    public void updateUserHistoryProgress(Long historyId) {
+        UpdateWrapper<UserHistory> update = Wrappers.update();
+        update.eq("id",historyId);
+        // 错误的写法
+//        update.set("progress","progress+1");
+        // 正确的写法
+        update.setSql(true, "progress=progress+1");
+        this.userHistoryMapper.update(null, update);
     }
 }

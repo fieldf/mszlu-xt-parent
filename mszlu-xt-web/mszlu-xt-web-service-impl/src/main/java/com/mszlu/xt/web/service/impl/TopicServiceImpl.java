@@ -30,4 +30,33 @@ public class TopicServiceImpl extends AbstractService implements TopicService {
             }
         });
     }
+
+    @Override
+    @Transactional
+    public CallResult submit(TopicParam topicParam) {
+        TopicDomain topicdomain = this.topicDomainRepository.createDomain(topicParam);
+        return this.serviceTemplate.execute(new AbstractTemplateAction<Object>() {
+            @Override
+            public CallResult<Object> checkBiz() {
+                return topicdomain.checkSubmitBiz();
+            }
+
+            @Override
+            public CallResult<Object> doAction() {
+                return topicdomain.submit();
+            }
+        });
+    }
+
+    @Override
+    public CallResult jump(TopicParam topicParam) {
+        TopicDomain topicdomain = this.topicDomainRepository.createDomain(topicParam);
+        return this.serviceTemplate.executeQuery(new AbstractTemplateAction<Object>() {
+
+            @Override
+            public CallResult<Object> doAction() {
+                return topicdomain.jump();
+            }
+        });
+    }
 }

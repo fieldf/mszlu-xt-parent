@@ -16,11 +16,23 @@ public class UserHistoryDomain {
         return userHistoryDomainRepository.findUserHistory(userId, subjectId, historyStatus);
     }
 
-    public UserHistory findUserHistoryById(Long id) {
-        return userHistoryDomainRepository.findUserHistoryById(id);
+    public UserHistory findUserHistoryById(Long userId, Long practiceId) {
+        return userHistoryDomainRepository.findUserHistoryById(userId, practiceId);
     }
 
     public void saveUserHistory(UserHistory userHistory) {
         userHistoryDomainRepository.save(userHistory);
+    }
+
+    public void updateUserHistoryErrorCount(Long userHistoryId) {
+        userHistoryDomainRepository.updateUserHistoryErrorCount(userHistoryId);
+    }
+
+    public void updateUserHistoryStatus(Long historyId, int historyStatus, long finishTime) {
+        userHistoryDomainRepository.updateUserHistoryStatus(historyId,historyStatus,finishTime);
+    }
+
+    public void updateUserHistoryProgress(Long historyId) {
+        userHistoryDomainRepository.updateUserHistoryProgress(historyId);
     }
 }
