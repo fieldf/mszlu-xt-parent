@@ -15,6 +15,7 @@
         <module>mszlu-xt-web</module>
         <module>mszlu-xt-common-pojo</module>
         <module>mszlu-xt-admin</module>
+        <module>mszlu-xt-log</module>
     </modules>
 
     <parent>
