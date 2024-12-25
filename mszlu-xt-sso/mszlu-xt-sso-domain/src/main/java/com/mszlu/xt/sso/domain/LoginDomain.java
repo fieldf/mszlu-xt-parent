@@ -5,12 +5,15 @@ import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.utils.JwtUtil;
 import com.mszlu.xt.sso.dao.data.User;
+import com.mszlu.xt.sso.dao.mongo.data.UserLog;
 import com.mszlu.xt.sso.domain.repository.LoginDomainRepository;
 import com.mszlu.xt.sso.model.enums.LoginType;
 import com.mszlu.xt.sso.model.params.LoginParam;
 import com.mszlu.xt.sso.model.params.UserParam;
 import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
 import me.chanjar.weixin.mp.bean.result.WxMpUser;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +50,9 @@ public class LoginDomain {
         }
         return CallResult.success();
     }
+
+    private User user;
+    private boolean isNewer;
 
     public CallResult<Object> wxLoginCallBack() {
         String code = loginParam.getCode();
@@ -125,10 +131,26 @@ public class LoginDomain {
                 user.setLastLoginTime(System.currentTimeMillis());
                 this.loginDomainRepository.createUserDomain(new UserParam()).updateUser(user);
             }
+            this.isNewer = isNew;
+            this.user = user;
             return CallResult.success();
         } catch (Exception e) {
             e.printStackTrace();
             return CallResult.fail(BusinessCodeEnum.LOGIN_WX_NOT_USER_INFO.getCode(), "授权问题,无法获取用户信息");
         }
+    }
+
+    public void wxLoginCallBackFinishUp(CallResult<Object> callResult) {
+        // 记录日志
+        UserLog userLog = new UserLog();
+        userLog.setUserId(user.getId());
+        userLog.setNewer(isNewer);
+        userLog.setSex(user.getSex());
+        userLog.setLastLoginTime(user.getLastLoginTime());
+        userLog.setRegisterTime(user.getRegisterTime());
+        // 同步操作 一旦代码出现异常 就影响了登录功能
+        // rocketmq挂掉 这是一个风险 不是代码bug
+
+        this.loginDomainRepository.recordLoginLog(userLog);
     }
 }
