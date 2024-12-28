@@ -15,4 +15,11 @@ public interface OrderService {
     CallResult wxPay(OrderParam orderParam);
 
     CallResult notifyOrder(String xmlData);
+
+    /**
+     * 根据订单id查询订单详情
+     * @param orderParam
+     * @return
+     */
+    CallResult findOrder(OrderParam orderParam);
 }
