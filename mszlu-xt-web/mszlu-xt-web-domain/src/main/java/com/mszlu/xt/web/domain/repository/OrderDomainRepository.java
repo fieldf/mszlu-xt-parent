@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mszlu.xt.common.wx.config.WxPayConfiguration;
 import com.mszlu.xt.pojo.Order;
 import com.mszlu.xt.pojo.OrderTrade;
+import com.mszlu.xt.sso.model.params.InviteParam;
 import com.mszlu.xt.web.dao.OrderMapper;
 import com.mszlu.xt.web.dao.OrderTradeMapper;
 import com.mszlu.xt.web.domain.*;
@@ -49,6 +50,14 @@ public class OrderDomainRepository {
 
     public CouponDomain createCouponDomain(CouponParam couponParam) {
         return couponDomainRepository.createDomain(couponParam);
+    }
+
+    @Autowired
+    private InviteDomainRepository inviteDomainRepository;
+
+    public InviteDomain createInviteDomain(InviteParam inviteParam) {
+
+        return inviteDomainRepository.createDomain(inviteParam);
     }
 
     public void saveOrder(Order order) {

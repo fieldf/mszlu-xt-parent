@@ -6,6 +6,7 @@ import com.mszlu.xt.sso.dao.UserMapper;
 import com.mszlu.xt.sso.dao.mongo.data.UserLog;
 import com.mszlu.xt.sso.domain.LoginDomain;
 import com.mszlu.xt.sso.domain.UserDomain;
+import com.mszlu.xt.sso.domain.thread.InviteThread;
 import com.mszlu.xt.sso.domain.thread.LogThread;
 import com.mszlu.xt.sso.model.params.LoginParam;
 import com.mszlu.xt.sso.model.params.UserParam;
@@ -38,6 +39,10 @@ public class LoginDomainRepository {
 
     @Autowired
     private UserDomainRepository userDomainRepository;
+
+    @Autowired
+    public InviteThread inviteThread;
+
 
     public LoginDomain createDomain(LoginParam loginParam) {
         return new LoginDomain(this, loginParam);

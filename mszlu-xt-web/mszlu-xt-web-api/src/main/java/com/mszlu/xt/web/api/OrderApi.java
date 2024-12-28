@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("order")
 @Slf4j
@@ -18,11 +20,6 @@ public class OrderApi {
 
     @Autowired
     private OrderService orderService;
-
-    @PostMapping("submitOrder")
-    public CallResult submitOrder(@RequestBody OrderParam orderParam){
-        return orderService.submitOrder(orderParam);
-    }
 
     @PostMapping("wxPay")
     public CallResult wxPay(@RequestBody OrderParam orderParam) {
@@ -52,5 +49,11 @@ public class OrderApi {
     @PostMapping(value = "orderList")
     public CallResult orderList(@RequestBody OrderParam orderParam){
         return orderService.orderList(orderParam);
+    }
+
+    @PostMapping("submitOrder")
+    public CallResult submitOrder(HttpServletRequest request, @RequestBody OrderParam orderParam){
+        orderParam.setRequest(request);
+        return orderService.submitOrder(orderParam);
     }
 }

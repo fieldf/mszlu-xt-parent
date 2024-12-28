@@ -11,8 +11,10 @@ import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.model.ListPageModel;
+import com.mszlu.xt.common.utils.AESUtils;
 import com.mszlu.xt.common.utils.CommonUtils;
 import com.mszlu.xt.pojo.*;
+import com.mszlu.xt.sso.model.enums.InviteType;
 import com.mszlu.xt.web.domain.pay.WxPayDomain;
 import com.mszlu.xt.web.domain.repository.OrderDomainRepository;
 import com.mszlu.xt.web.model.CourseViewModel;
@@ -27,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,12 +97,47 @@ public class OrderDomain {
         }
         orderDisplayModel.setSubject(subject.toString());
 
-        //16代表30分钟 延迟30m执行消费 3代表10秒
+        //16代表30分钟 延迟30m执行消费 3代表10秒  30分钟后延迟消费 未支付取消订单
         Map<String,String> map = new HashMap<>();
         map.put("orderId",order.getOrderId());
-        map.put("time","15");
+        map.put("time","1800");
         this.orderDomainRepository.mqService.sendDelayedMessage("create_order_delay",map,3);
+
+        // 邀请信息的判断
+        fillInvite(userId, order);
         return CallResult.success(orderDisplayModel);
+    }
+
+    private void fillInvite(Long userId, Order order) {
+        HttpServletRequest request = this.orderParam.getRequest();
+        Cookie[] cookies = request.getCookies();
+        if(cookies == null){
+            return;
+        }
+        List<Map<String,String>> billTypeList = new ArrayList<>();
+        for (Cookie cookie : cookies) {
+            String name = cookie.getName();
+            String[] inviteCookie = name.split("_i_ga_b_");
+            if (inviteCookie.length == 2){
+                Map<String,String> map = new HashMap<>();
+                map.put("billType",inviteCookie[1]);
+                map.put("userId",cookie.getValue());
+                billTypeList.add(map);
+            }
+        }
+        for (Map<String,String> inviteMap : billTypeList) {
+            //有推荐信息，构建邀请信息
+            Invite invite = new Invite();
+            invite.setInviteInfo(order.getOrderId());
+            invite.setInviteStatus(0);
+            invite.setInviteTime(System.currentTimeMillis());
+            invite.setInviteType(InviteType.LOGIN.getCode());
+            invite.setInviteUserId(userId);
+            invite.setUserId(Long.parseLong(AESUtils.decrypt(inviteMap.get("userId"))));
+            invite.setBillType(inviteMap.get("billType"));
+            invite.setCreateTime(System.currentTimeMillis());
+            this.orderDomainRepository.createInviteDomain(null).save(invite);
+        }
     }
 
     private BigDecimal checkCoupon(Long userId,Coupon coupon) {

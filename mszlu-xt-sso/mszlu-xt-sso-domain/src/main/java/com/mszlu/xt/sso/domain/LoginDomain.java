@@ -3,10 +3,14 @@ package com.mszlu.xt.sso.domain;
 import com.mszlu.xt.common.constants.RedisKey;
 import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
+import com.mszlu.xt.common.utils.AESUtils;
 import com.mszlu.xt.common.utils.JwtUtil;
+import com.mszlu.xt.pojo.Invite;
 import com.mszlu.xt.sso.dao.data.User;
 import com.mszlu.xt.sso.dao.mongo.data.UserLog;
 import com.mszlu.xt.sso.domain.repository.LoginDomainRepository;
+import com.mszlu.xt.sso.domain.thread.InviteThread;
+import com.mszlu.xt.sso.model.enums.InviteType;
 import com.mszlu.xt.sso.model.enums.LoginType;
 import com.mszlu.xt.sso.model.params.LoginParam;
 import com.mszlu.xt.sso.model.params.UserParam;
@@ -16,7 +20,12 @@ import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -103,6 +112,8 @@ public class LoginDomain {
                 user.setSchool("");
                 loginDomainRepository.createUserDomain(new UserParam()).saveUser(user);
                 isNew = true;
+
+                fillInvite(user);
             }
             // 5. jwt技术 生成token 需要把token存储起来
             String token = JwtUtil.createJWT(7 * 24 * 60 * 60 * 1000, user.getId(), secretKey);
@@ -140,6 +151,31 @@ public class LoginDomain {
         }
     }
 
+    /**
+     * 邀请信息
+     * @param user
+     */
+    private void fillInvite(User user) {
+        HttpServletRequest request = this.loginParam.getRequest();
+        Cookie[] cookies = request.getCookies();
+        if(cookies == null){
+            return;
+        }
+        List<Map<String,String>> billTypeList = new ArrayList<>();
+        for (Cookie cookie : cookies) {
+            String name = cookie.getName();
+            String[] inviteCookie = name.split("_i_ga_b_");
+            if (inviteCookie.length == 2){
+                Map<String,String> map = new HashMap<>();
+                map.put("billType",inviteCookie[1]);
+                map.put("userId",cookie.getValue());
+                billTypeList.add(map);
+            }
+        }
+
+        this.loginDomainRepository.inviteThread.fillInvite(billTypeList, user);
+    }
+
     public void wxLoginCallBackFinishUp(CallResult<Object> callResult) {
         // 记录日志
         UserLog userLog = new UserLog();
@@ -153,4 +189,5 @@ public class LoginDomain {
 
         this.loginDomainRepository.recordLoginLog(userLog);
     }
+
 }
