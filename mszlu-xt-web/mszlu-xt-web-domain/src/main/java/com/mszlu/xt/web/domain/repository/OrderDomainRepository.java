@@ -3,6 +3,7 @@ package com.mszlu.xt.web.domain.repository;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mszlu.xt.common.wx.config.WxPayConfiguration;
 import com.mszlu.xt.pojo.Order;
 import com.mszlu.xt.pojo.OrderTrade;
@@ -35,7 +36,7 @@ public class OrderDomainRepository {
     private OrderTradeMapper orderTradeMapper;
 
     public OrderDomain createDomain(OrderParam orderParam) {
-        return new OrderDomain(this,orderParam);
+        return new OrderDomain(this, orderParam);
     }
 
     public SubjectDomain createSubjectDomain(SubjectParam subjectParam) {
@@ -76,21 +77,22 @@ public class OrderDomainRepository {
 
     @Autowired
     public WxPayConfiguration wxPayConfiguration;
+
     public void updatePayOrderId(Order order) {
         LambdaUpdateWrapper<Order> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.eq(Order::getId,order.getId());
-        updateWrapper.set(Order::getPayOrderId,order.getPayOrderId());
+        updateWrapper.eq(Order::getId, order.getId());
+        updateWrapper.set(Order::getPayOrderId, order.getPayOrderId());
         this.orderMapper.update(null, updateWrapper);
     }
 
 
-    public boolean updateOrderStatusAndPayType(Order order,Integer updateOrderStatus) {
+    public boolean updateOrderStatusAndPayType(Order order, Integer updateOrderStatus) {
         LambdaUpdateWrapper<Order> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.eq(Order::getOrderId,order.getOrderId());
+        updateWrapper.eq(Order::getOrderId, order.getOrderId());
         //需要防止在修改的时候 被别的线程所修改
-        updateWrapper.eq(Order::getOrderStatus,order.getOrderStatus());
-        updateWrapper.set(Order::getOrderStatus,updateOrderStatus);
-        updateWrapper.set(Order::getPayType,order.getPayType());
+        updateWrapper.eq(Order::getOrderStatus, order.getOrderStatus());
+        updateWrapper.set(Order::getOrderStatus, updateOrderStatus);
+        updateWrapper.set(Order::getPayType, order.getPayType());
         int update = this.orderMapper.update(null, updateWrapper);
         return update > 0;
     }
@@ -98,6 +100,7 @@ public class OrderDomainRepository {
 
     @Autowired
     private UserCourseDomainRepository userCourseDomainRepository;
+
     public void updateOrderTrade(OrderTrade orderTrade) {
         this.orderTradeMapper.updateById(orderTrade);
     }
@@ -112,10 +115,10 @@ public class OrderDomainRepository {
 
     public void updateOrderStatusAndPayStatus(Order order) {
         LambdaUpdateWrapper<Order> updateWrapper = Wrappers.lambdaUpdate();
-        updateWrapper.eq(Order::getId,order.getId());
-        updateWrapper.set(Order::getOrderStatus,order.getOrderStatus());
-        updateWrapper.set(Order::getPayStatus,order.getPayStatus());
-        updateWrapper.set(Order::getPayTime,order.getPayTime());
+        updateWrapper.eq(Order::getId, order.getId());
+        updateWrapper.set(Order::getOrderStatus, order.getOrderStatus());
+        updateWrapper.set(Order::getPayStatus, order.getPayStatus());
+        updateWrapper.set(Order::getPayTime, order.getPayTime());
         this.orderMapper.update(null, updateWrapper);
     }
 
@@ -125,5 +128,13 @@ public class OrderDomainRepository {
         queryWrapper.last("limit 1");
         OrderTrade orderTrade = orderTradeMapper.selectOne(queryWrapper);
         return orderTrade;
+    }
+
+    public Page<Order> orderList(Long userId, int orderStatus, int currentPage, int pageSize) {
+        LambdaQueryWrapper<Order> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(Order::getUserId, userId);
+        queryWrapper.ne(Order::getOrderStatus, orderStatus);
+        Page<Order> page = new Page<>(currentPage, pageSize);
+        return this.orderMapper.selectPage(page, queryWrapper);
     }
 }

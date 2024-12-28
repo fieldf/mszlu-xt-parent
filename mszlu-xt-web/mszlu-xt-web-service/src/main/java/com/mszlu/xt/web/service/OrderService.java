@@ -22,4 +22,11 @@ public interface OrderService {
      * @return
      */
     CallResult findOrder(OrderParam orderParam);
+
+    /**
+     * 订单列表
+     * @param orderParam
+     * @return
+     */
+    CallResult orderList(OrderParam orderParam);
 }
