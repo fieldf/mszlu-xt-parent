@@ -197,4 +197,6 @@ public class CourseDomain {
     public Course findCourseById(Long courseId) {
         return courseDomainRepository.findCourseById(courseId);
     }
+
+
 }

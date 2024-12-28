@@ -2,6 +2,7 @@ package com.mszlu.xt.web.domain.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.mszlu.xt.pojo.Coupon;
 import com.mszlu.xt.pojo.UserCoupon;
@@ -46,5 +47,23 @@ public class CouponDomainRepository {
 
     public CourseDomain createCourseDomain(CourseParam courseParam) {
         return courseDomainRepository.createDomain(courseParam);
+    }
+
+    public UserCoupon findUserCouponByUserIdAndCouponId(Long userId, Long couponId) {
+        LambdaQueryWrapper<UserCoupon> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.eq(UserCoupon::getUserId,userId);
+        queryWrapper.eq(UserCoupon::getCouponId,couponId);
+        //0代表 未使用 应该做成枚举
+        queryWrapper.eq(UserCoupon::getStatus,0);
+        queryWrapper.last("limit 1");
+        UserCoupon userCoupon = userCouponMapper.selectOne(queryWrapper);
+        return userCoupon;
+    }
+
+    public void updateCouponStatus(UserCoupon userCoupon) {
+        LambdaUpdateWrapper<UserCoupon> updateWrapper = Wrappers.lambdaUpdate();
+        updateWrapper.eq(UserCoupon::getId,userCoupon.getId());
+        updateWrapper.set(UserCoupon::getStatus,userCoupon.getStatus());
+        userCouponMapper.update(null, updateWrapper);
     }
 }
