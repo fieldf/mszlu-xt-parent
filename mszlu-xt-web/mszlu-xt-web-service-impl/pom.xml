@@ -27,6 +27,4 @@
             <artifactId>mszlu-xt-web-domain</artifactId>
         </dependency>
     </dependencies>
-
-
 </project>
