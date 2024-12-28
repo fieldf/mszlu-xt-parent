@@ -10,6 +10,7 @@ import com.mszlu.xt.pojo.Course;
 import com.mszlu.xt.pojo.UserCourse;
 import com.mszlu.xt.pojo.UserHistory;
 import com.mszlu.xt.web.domain.repository.CourseDomainRepository;
+import com.mszlu.xt.web.model.CourseDetailModel;
 import com.mszlu.xt.web.model.CourseViewModel;
 import com.mszlu.xt.web.model.SubjectModel;
 import com.mszlu.xt.web.model.SubjectViewModel;
@@ -163,5 +164,29 @@ public class CourseDomain {
 
     public List<Long> findCourseIdListBySubjectId(Long subjectId) {
         return courseDomainRepository.findCourseIdListBySubjectId(subjectId);
+    }
+
+    public CallResult<Object> courseDetail() {
+        Long courseId = this.courseParam.getCourseId();
+        Course course = this.courseDomainRepository.findCourseById(courseId);
+        if (course == null){
+            return CallResult.fail(BusinessCodeEnum.COURSE_NOT_EXIST.getCode(),"订单不存在");
+        }
+        CourseDetailModel courseDetailModel = new CourseDetailModel();
+        courseDetailModel.setCourseId(courseId);
+        courseDetailModel.setCourseName(course.getCourseName());
+        courseDetailModel.setCourseTime(course.getOrderTime());
+        courseDetailModel.setPrice(course.getCourseZhePrice());
+        List<SubjectModel> subjectList = this.courseDomainRepository.createSubjectDomain(null).findSubjectListByCourseId(courseId);
+        StringBuilder subjectStr = new StringBuilder();
+        for (SubjectModel subject : subjectList){
+            subjectStr.append(subject.getSubjectName()).append(" ").append(subject.getSubjectGrade()).append(" ").append(subject.getSubjectTerm()).append(",");
+        }
+        int length = subjectStr.toString().length();
+        if (length > 0){
+            subjectStr = new StringBuilder(subjectStr.substring(0, length - 1));
+        }
+        courseDetailModel.setSubjectInfo(subjectStr.toString());
+        return CallResult.success(courseDetailModel);
     }
 }

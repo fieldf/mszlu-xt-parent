@@ -80,4 +80,6 @@ public class CourseDomainRepository {
         List<CourseSubject> courseSubjects = this.courseSubjectMapper.selectList(queryWrapper);
         return courseSubjects.stream().map(CourseSubject::getCourseId).collect(Collectors.toList());
     }
+
+
 }
