@@ -8,14 +8,8 @@ import com.mszlu.xt.pojo.Course;
 import com.mszlu.xt.pojo.CourseSubject;
 import com.mszlu.xt.web.dao.CourseMapper;
 import com.mszlu.xt.web.dao.CourseSubjectMapper;
-import com.mszlu.xt.web.domain.CourseDomain;
-import com.mszlu.xt.web.domain.SubjectDomain;
-import com.mszlu.xt.web.domain.UserCourseDomain;
-import com.mszlu.xt.web.domain.UserHistoryDomain;
-import com.mszlu.xt.web.model.params.CourseParam;
-import com.mszlu.xt.web.model.params.SubjectParam;
-import com.mszlu.xt.web.model.params.UserCourseParam;
-import com.mszlu.xt.web.model.params.UserHistoryParam;
+import com.mszlu.xt.web.domain.*;
+import com.mszlu.xt.web.model.params.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +66,13 @@ public class CourseDomainRepository {
 
     public UserHistoryDomain createUserHistoryDomain(UserHistoryParam userHistoryParam) {
         return userHistoryDomainRepository.createDomain(userHistoryParam);
+    }
+
+    @Autowired
+    private CouponDomainRepository couponDomainRepository;
+
+    public CouponDomain createCouponDomain(CouponParam couponParam) {
+        return this.couponDomainRepository.createDomain(couponParam);
     }
 
     public List<Long> findCourseIdListBySubjectId(Long subjectId) {

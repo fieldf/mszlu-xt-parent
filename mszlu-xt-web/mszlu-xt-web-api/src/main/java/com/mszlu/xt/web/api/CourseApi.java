@@ -32,4 +32,9 @@ public class CourseApi {
     public CallResult courseDetail(@RequestBody CourseParam courseParam){
         return courseService.courseDetail(courseParam);
     }
+
+    @PostMapping(value = "myCoupon")
+    public CallResult myCoupon(@RequestBody CourseParam courseParam){
+        return courseService.myCoupon(courseParam);
+    }
 }

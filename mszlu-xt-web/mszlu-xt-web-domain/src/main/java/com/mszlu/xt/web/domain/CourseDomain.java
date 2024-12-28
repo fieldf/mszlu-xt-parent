@@ -10,10 +10,7 @@ import com.mszlu.xt.pojo.Course;
 import com.mszlu.xt.pojo.UserCourse;
 import com.mszlu.xt.pojo.UserHistory;
 import com.mszlu.xt.web.domain.repository.CourseDomainRepository;
-import com.mszlu.xt.web.model.CourseDetailModel;
-import com.mszlu.xt.web.model.CourseViewModel;
-import com.mszlu.xt.web.model.SubjectModel;
-import com.mszlu.xt.web.model.SubjectViewModel;
+import com.mszlu.xt.web.model.*;
 import com.mszlu.xt.web.model.enums.HistoryStatus;
 import com.mszlu.xt.web.model.params.CourseParam;
 import com.mszlu.xt.web.model.params.SubjectParam;
@@ -188,5 +185,16 @@ public class CourseDomain {
         }
         courseDetailModel.setSubjectInfo(subjectStr.toString());
         return CallResult.success(courseDetailModel);
+    }
+
+    public CallResult<Object> myCoupon() {
+        Long userId = UserThreadLocal.get();
+        Long courseId = this.courseParam.getCourseId();
+        List<UserCouponModel> list = this.courseDomainRepository.createCouponDomain(null).findUserCoupon(userId,courseId);
+        return CallResult.success(list);
+    }
+
+    public Course findCourseById(Long courseId) {
+        return courseDomainRepository.findCourseById(courseId);
     }
 }
