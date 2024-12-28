@@ -1,5 +1,6 @@
 package com.mszlu.xt.web.domain;
 
+import com.mszlu.xt.pojo.Order;
 import com.mszlu.xt.pojo.UserCourse;
 import com.mszlu.xt.web.domain.repository.UserCourseDomainRepository;
 import com.mszlu.xt.web.model.params.UserCourseParam;
@@ -26,5 +27,28 @@ public class UserCourseDomain {
 
     public Integer countUserCourseInCourseIdList(Long userId, List<Long> courseIdList, long currentTimeMillis) {
         return userCourseDomainRepository.countUserCourseInCourseIdList(userId, courseIdList, currentTimeMillis);
+    }
+
+    public void saveUserCourse(Order order) {
+        Long courseId = order.getCourseId();
+        Long userId = order.getUserId();
+        UserCourse course = this.userCourseDomainRepository.findUserCourseByUserIdAndCourseId(userId,courseId);
+        if (course == null){
+            course = new UserCourse();
+            course.setCourseId(courseId);
+            course.setUserId(userId);
+            course.setCreateTime(System.currentTimeMillis());
+            course.setExpireTime(System.currentTimeMillis() + order.getExpireTime() * 24 * 60 * 60 * 1000L);
+            course.setStudyCount(0);
+            this.userCourseDomainRepository.saveUserCourse(course);
+        } else {
+            Long expireTime = course.getExpireTime();
+            long currentTimeMillis = System.currentTimeMillis();
+            if (currentTimeMillis >= expireTime){
+                expireTime = currentTimeMillis;
+            }
+            course.setExpireTime(expireTime + order.getExpireTime() * 24 * 60 * 60 * 1000L);
+            this.userCourseDomainRepository.updateUserCourse(course);
+        }
     }
 }

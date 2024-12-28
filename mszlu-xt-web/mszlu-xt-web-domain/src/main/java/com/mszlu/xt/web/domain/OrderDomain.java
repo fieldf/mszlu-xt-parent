@@ -1,10 +1,17 @@
 package com.mszlu.xt.web.domain;
 
+import com.alibaba.fastjson.JSON;
+import com.github.binarywang.wxpay.bean.notify.WxPayOrderNotifyResult;
+import com.github.binarywang.wxpay.bean.order.WxPayNativeOrderResult;
+import com.github.binarywang.wxpay.bean.request.BaseWxPayRequest;
+import com.github.binarywang.wxpay.bean.request.WxPayUnifiedOrderRequest;
+import com.github.binarywang.wxpay.exception.WxPayException;
 import com.mszlu.xt.common.login.UserThreadLocal;
 import com.mszlu.xt.common.model.BusinessCodeEnum;
 import com.mszlu.xt.common.model.CallResult;
 import com.mszlu.xt.common.utils.CommonUtils;
 import com.mszlu.xt.pojo.*;
+import com.mszlu.xt.web.domain.pay.WxPayDomain;
 import com.mszlu.xt.web.domain.repository.OrderDomainRepository;
 import com.mszlu.xt.web.model.OrderDisplayModel;
 import com.mszlu.xt.web.model.SubjectModel;
@@ -12,10 +19,15 @@ import com.mszlu.xt.web.model.enums.OrderStatus;
 import com.mszlu.xt.web.model.enums.PayStatus;
 import com.mszlu.xt.web.model.enums.PayType;
 import com.mszlu.xt.web.model.params.OrderParam;
+import lombok.extern.slf4j.Slf4j;
+import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 public class OrderDomain {
     private OrderDomainRepository orderDomainRepository;
     private OrderParam orderParam;
@@ -74,6 +86,12 @@ public class OrderDomain {
             subject = new StringBuilder(subject.substring(0,subject.toString().length() - 1));
         }
         orderDisplayModel.setSubject(subject.toString());
+
+        //16代表30分钟 延迟30m执行消费 3代表10秒
+        Map<String,String> map = new HashMap<>();
+        map.put("orderId",order.getOrderId());
+        map.put("time","15");
+        this.orderDomainRepository.mqService.sendDelayedMessage("create_order_delay",map,3);
         return CallResult.success(orderDisplayModel);
     }
 
@@ -102,5 +120,127 @@ public class OrderDomain {
         userCoupon.setStatus(4);
         couponDomain.updateCouponStatus(userCoupon);
         return coupon.getPrice();
+    }
+
+    public CallResult<Object> wxPay() {
+        /**
+         * 1. 获取到登录用户
+         * 2. 根据订单号 查询订单 检查订单状态和支付状态
+         * 3. 根据课程id 查询课程 确保课程的状态正常
+         * 4. 组装微信支付需要的参数 发起微信的调用 微信会给我们返回对应的二维码链接
+         * 5. 更改订单状态 为已提交
+         */
+        Long userId = UserThreadLocal.get();
+        String orderId = this.orderParam.getOrderId();
+        Order order = this.orderDomainRepository.findOrderByOrderId(orderId);
+        if (order == null){
+            return CallResult.fail(BusinessCodeEnum.ORDER_NOT_EXIST.getCode(),"订单不存在");
+        }
+        if (order.getOrderStatus().equals(OrderStatus.PAYED.getCode())){
+            return CallResult.fail(BusinessCodeEnum.ORDER_AREADY_PAYED.getCode(),"订单已付款");
+        }
+        if (order.getPayStatus().equals(PayStatus.PAYED.getCode())){
+            return CallResult.fail(BusinessCodeEnum.ORDER_AREADY_PAYED.getCode(),"订单已付款");
+        }
+        Integer payType = this.orderParam.getPayType();
+        //用于测试
+        order.setOrderAmount(BigDecimal.valueOf(0.01));
+        order.setPayType(payType);
+        Long courseId = order.getCourseId();
+        Course course = this.orderDomainRepository.createCourseDomain(null).findCourseById(courseId);
+        if (course == null) {
+            return CallResult.fail(-999,"课程已被删除");
+        }
+        String payOrderId = System.currentTimeMillis() + String.valueOf(CommonUtils.random5Num()) + userId%10000;
+        order.setPayOrderId(payOrderId);
+        this.orderDomainRepository.updatePayOrderId(order);
+
+        WxPayDomain wxPayDomain = new WxPayDomain(this.orderDomainRepository.wxPayConfiguration);
+        WxPayUnifiedOrderRequest orderRequest = new WxPayUnifiedOrderRequest();
+        orderRequest.setNotifyUrl(this.orderDomainRepository.wxPayConfiguration.wxNotifyUrl);
+        orderRequest.setBody(course.getCourseName());
+        orderRequest.setOutTradeNo(payOrderId);
+        orderRequest.setProductId(String.valueOf(courseId));
+        orderRequest.setTotalFee(BaseWxPayRequest.yuanToFen(String.valueOf(order.getOrderAmount().doubleValue())));//元转成分
+        orderRequest.setSpbillCreateIp("182.92.102.161");
+        orderRequest.setTradeType("NATIVE");
+        orderRequest.setTimeStart(new DateTime(order.getCreateTime()).toString("yyyyMMddHHmmss"));
+        try {
+            WxPayNativeOrderResult wxPayNativeOrderResult = wxPayDomain.getWxPayService().createOrder(orderRequest);
+            this.orderDomainRepository.updateOrderStatusAndPayType(order,OrderStatus.COMMIT.getCode());
+            return CallResult.success(wxPayNativeOrderResult.getCodeUrl());
+        } catch (WxPayException e) {
+            e.printStackTrace();
+            return CallResult.fail(BusinessCodeEnum.PAY_ORDER_CREATE_FAIL.getCode(),"create order fail");
+        }
+    }
+
+
+    public CallResult<Object> notifyOrder(String xmlData) {
+        /**
+         * 1. 解析微信参数
+         * 2. 根据payorderid进行订单查询
+         * 3. 如果订单存在 订单更改为已支付
+         * 4. 处理了交易的流水信息 做了一个保存
+         */
+        WxPayDomain wxPayDomain = new WxPayDomain(this.orderDomainRepository.wxPayConfiguration);
+        try {
+            WxPayOrderNotifyResult notifyResult  = wxPayDomain.getWxPayService().parseOrderNotifyResult(xmlData);
+            String returnCode = notifyResult.getReturnCode();
+            if ("SUCCESS".equals(returnCode)){
+                log.info(JSON.toJSONString(notifyResult));
+                String orderId = notifyResult.getOutTradeNo();
+                // 微信方的交易订单号
+                String transactionId = notifyResult.getTransactionId();
+                Order order = this.orderDomainRepository.findOrderByPayOrderId(orderId);
+                if (order == null){
+                    return CallResult.fail(BusinessCodeEnum.ORDER_NOT_EXIST.getCode(),"order not exist");
+                }
+                if (order.getOrderStatus() == OrderStatus.PAYED.getCode() && order.getPayStatus()==PayStatus.PAYED.getCode()) {
+                    // 代表订单已经处理过了 无需进行重复处理
+                    return CallResult.success();
+                }
+                order.setOrderStatus(OrderStatus.PAYED.getCode());
+                order.setPayStatus(PayStatus.PAYED.getCode());
+                // 支付完成时间
+//                String timeEnd = notifyResult.getTimeEnd();
+                order.setPayTime(System.currentTimeMillis());
+                this.orderDomainRepository.updateOrderStatusAndPayStatus(order);
+                //添加支付信息
+                OrderTrade orderTrade = this.orderDomainRepository.findOrderTrade(order.getOrderId());
+
+
+                if (orderTrade != null){
+                    // 以前添加过 更新
+                    orderTrade.setPayInfo(JSON.toJSONString(notifyResult));
+                    this.orderDomainRepository.updateOrderTrade(orderTrade);
+                }else{
+                    // 第一次添加流水
+                    orderTrade = new OrderTrade();
+                    orderTrade.setPayInfo(JSON.toJSONString(notifyResult));
+                    orderTrade.setOrderId(order.getOrderId());
+                    orderTrade.setUserId(order.getUserId());
+                    orderTrade.setPayType(order.getPayType());
+                    orderTrade.setTransactionId(transactionId);
+                    this.orderDomainRepository.saveOrderTrade(orderTrade);
+                }
+                //添加课程
+                this.orderDomainRepository.createUserCourseDomain(null).saveUserCourse(order);
+                Long couponId = order.getCouponId();
+                if (couponId > 0) {
+                    UserCoupon userCoupon = this.orderDomainRepository.createCouponDomain(null).findUserCouponByUserId(order.getUserId(),couponId);
+                    if (userCoupon != null){
+                        userCoupon.setStatus(1);
+                        this.orderDomainRepository.createCouponDomain(null).updateUserCoupon(userCoupon);
+                    }
+                }
+                return CallResult.success();
+            }
+            log.error("notifyOrder error: {}",notifyResult.getReturnMsg());
+            return CallResult.fail();
+        } catch (WxPayException e) {
+            e.printStackTrace();
+            return CallResult.fail(BusinessCodeEnum.PAY_ORDER_CREATE_FAIL.getCode(), "微信支付信息处理失败");
+        }
     }
 }

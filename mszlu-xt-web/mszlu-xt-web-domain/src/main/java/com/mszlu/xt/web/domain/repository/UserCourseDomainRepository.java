@@ -40,4 +40,28 @@ public class UserCourseDomainRepository {
         return userCourseMapper.selectCount(queryWrapper);
 
     }
+
+    public Integer countUserCourseByUserId(Long userId, List<Long> courseIdList, long currentTime) {
+        LambdaQueryWrapper<UserCourse> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(UserCourse::getCourseId,courseIdList);
+        queryWrapper.eq(UserCourse::getUserId,userId);
+        queryWrapper.gt(UserCourse::getExpireTime,currentTime);
+        return this.userCourseMapper.selectCount(queryWrapper);
+    }
+
+    public void saveUserCourse(UserCourse course) {
+        this.userCourseMapper.insert(course);
+    }
+
+    public void updateUserCourse(UserCourse course) {
+        this.userCourseMapper.updateById(course);
+    }
+
+    public UserCourse findUserCourseByUserIdAndCourseId(Long userId, Long courseId) {
+        LambdaQueryWrapper<UserCourse> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserCourse::getCourseId, courseId);
+        queryWrapper.eq(UserCourse::getUserId, userId);
+        queryWrapper.last("limit 1");
+        return userCourseMapper.selectOne(queryWrapper);
+    }
 }

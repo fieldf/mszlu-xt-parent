@@ -45,7 +45,7 @@ public enum BusinessCodeEnum {
     PAY_ORDER_CREATE_FAIL(1041001101,"创建订单失败"),
     ORDER_NOT_EXIST(1041001102,"订单号不存在"),
     ORDER_NOT_CANCEL(1041001103,"已付款的订单不能取消"),
-    ;
+    ORDER_AREADY_PAYED(111, "订单已支付");
 
 
     private static final Map<Integer, BusinessCodeEnum> codeMap = new HashMap<Integer, BusinessCodeEnum>((int)(BusinessCodeEnum.values().length/0.75)+1);
